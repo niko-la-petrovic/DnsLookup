@@ -1,59 +1,43 @@
-﻿using System;
+﻿using DnsLookup.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Net;
-using System.Text;
+using System.Net.Sockets;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace DnsLookup
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window, INotifyPropertyChanged
+    public partial class MainWindow : Window
     {
-        private string selectedDomainName = "a";
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
         protected UserSettings UserSettings { get; set; } = new();
-        protected IEnumerable<string> DomainNames => UserSettings?.DomainNames;
-        
-        // TODO move to viewmodel
-        public string SelectedDomainName
-        {
-            get => selectedDomainName; set
-            {
-                selectedDomainName = value;
-                OnPropertyChanged(nameof(SelectedDomainName));
-            }
-        }
-
-        protected void OnPropertyChanged(string name)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-        }
+        protected DnsViewModel viewModel;
 
         public MainWindow()
         {
             InitializeComponent();
+            viewModel = new DnsViewModel();
+            DataContext = viewModel;
             Task.Run(async () =>
             {
                 UserSettings = await UserSettings.LoadAsync();
+
+                viewModel.SelectedDomainName = UserSettings.DomainNames.LastOrDefault() ?? "";
+                viewModel.DomainNames = UserSettings.DomainNames;
             });
         }
 
-        private void btnGetIp_Click(object sender, RoutedEventArgs e)
+        protected void UpdateSuggestions()
+        {
+            viewModel.DomainNames = UserSettings?.DomainNames;
+        }
+
+        private void BtnGetIp_Click(object sender, RoutedEventArgs e)
         {
             string domainName = txtDomainName.Text;
             if (!string.IsNullOrWhiteSpace(domainName))
@@ -70,19 +54,27 @@ namespace DnsLookup
                     if (!UserSettings.DomainNames.Contains(domainName))
                     {
                         UserSettings.DomainNames.Add(domainName);
-                        Task.Run(async () => await UserSettings.SaveAsync());
+                        UpdateSuggestions();
                     }
+                    else
+                    {
+                        UserSettings.DomainNames.Remove(domainName);
+                        UserSettings.DomainNames.Add(domainName);
+                    }
+                    Task.Run(async () => await UserSettings.SaveAsync());
 
                     if (UserSettings.CopyToClipboard)
                         Clipboard.SetData(DataFormats.Text, ipAddress);
                 }
-                catch (Exception)
+                catch (SocketException ex)
                 {
+                    MessageBox.Show(this, ex.Message, "DNS Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    txtIpAddress.Text = "";
                 }
             }
         }
 
-        private void checkCopyToClipboard_Checked(object sender, RoutedEventArgs e)
+        private void CheckCopyToClipboard_Checked(object sender, RoutedEventArgs e)
         {
             UserSettings.CopyToClipboard = checkCopyToClipboard.IsChecked ?? false;
         }
