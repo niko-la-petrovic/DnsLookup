@@ -6,40 +6,47 @@
         xmlns:local="clr-namespace:DnsLookup"
         xmlns:controls="clr-namespace:System.Windows.Controls;assembly=DotNetProjects.Input.Toolkit"
         mc:Ignorable="d"
-        Title="DNSLookup" Height="160" Width="600" Icon="dns.ico">
-    <Grid Margin="10">
+        Title="DNSLookup" Height="180" Width="600" Icon="dns.ico">
+    <DockPanel>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="_File">
+                <MenuItem Header="Open settings folder" Click="OpenSettingsFolder_Click"></MenuItem>
+            </MenuItem>
+        </Menu>
+        <Grid Margin="10">
 
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
 
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
 
-        <StackPanel Grid.Row="0" Grid.Column="0">
-            <Label>Domain Name</Label>
-            <controls:AutoCompleteBox x:Name="txtDomainName" 
+            <StackPanel Grid.Row="0" Grid.Column="0">
+                <Label>Domain Name</Label>
+                <controls:AutoCompleteBox x:Name="txtDomainName" 
                 ItemsSource="{Binding DomainNames, Mode=OneWay}"
                 Text="{Binding SelectedDomainName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-            <Button x:Name="btnGetIp" Click="BtnGetIp_Click" IsDefault="True" Margin="0,5,0,0">Get IP</Button>
-        </StackPanel>
+                <Button x:Name="btnGetIp" Click="GetIp_Click" IsDefault="True" Margin="0,5,0,0">Get IP</Button>
+            </StackPanel>
 
-        <StackPanel Grid.Row="0" Grid.Column="1">
-            <Label>IP Address</Label>
-            <TextBox x:Name="txtIpAddress" IsEnabled="False"/>
-        </StackPanel>
+            <StackPanel Grid.Row="0" Grid.Column="1">
+                <Label>IP Address</Label>
+                <TextBox x:Name="txtIpAddress" IsEnabled="False"/>
+            </StackPanel>
 
-        <StackPanel Grid.Row="1" Grid.Column="0">
-            <DockPanel>
-                <StackPanel Orientation="Horizontal">
-                    <CheckBox x:Name="checkCopyToClipboard" Checked="CheckCopyToClipboard_Checked" VerticalAlignment="Center" />
-                    <Label VerticalAlignment="Top">Copy To Clipboard</Label>
-                </StackPanel>
-            </DockPanel>
-        </StackPanel>
-        
-    </Grid>
+            <StackPanel Grid.Row="1" Grid.Column="0">
+                <DockPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <CheckBox x:Name="checkCopyToClipboard" Checked="CheckCopyToClipboard_Checked" VerticalAlignment="Center" />
+                        <Label VerticalAlignment="Top">Copy To Clipboard</Label>
+                    </StackPanel>
+                </DockPanel>
+            </StackPanel>
+
+        </Grid>
+    </DockPanel>
 </Window>

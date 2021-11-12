@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -37,7 +38,7 @@ namespace DnsLookup
             viewModel.DomainNames = UserSettings?.DomainNames;
         }
 
-        private void BtnGetIp_Click(object sender, RoutedEventArgs e)
+        private void GetIp_Click(object sender, RoutedEventArgs e)
         {
             string domainName = txtDomainName.Text;
             if (!string.IsNullOrWhiteSpace(domainName))
@@ -77,6 +78,11 @@ namespace DnsLookup
         private void CheckCopyToClipboard_Checked(object sender, RoutedEventArgs e)
         {
             UserSettings.CopyToClipboard = checkCopyToClipboard.IsChecked ?? false;
+        }
+
+        private void OpenSettingsFolder_Click(object sender, RoutedEventArgs e)
+        {
+            Process.Start("explorer.exe", UserSettings.AppDataDir);
         }
     }
 }
